@@ -41,12 +41,18 @@ public class AttendanceController {
 	 */
 	@RequestMapping(path = "/detail", method = RequestMethod.GET)
 	public String index(Model model) {
+//	現在改修中
+//		// 受講生権限の場合
+//		if(loginUserDto.getRole().equals("0001")) {
+//			Boolean hasBlankPastDate = studentAttendanceService.notEnterCheck();
+//			model.addAttribute("hasBlankPastDate", hasBlankPastDate);
+//		}
 
 		// 勤怠一覧の取得
 		List<AttendanceManagementDto> attendanceManagementDtoList = studentAttendanceService
 				.getAttendanceManagement(loginUserDto.getCourseId(), loginUserDto.getLmsUserId());
 		model.addAttribute("attendanceManagementDtoList", attendanceManagementDtoList);
-
+		
 		return "attendance/detail";
 	}
 
