@@ -40,13 +40,13 @@ public class AttendanceController {
 	 * @throws ParseException
 	 */
 	@RequestMapping(path = "/detail", method = RequestMethod.GET)
-	public String index(Model model) {
-//	現在改修中
-//		// 受講生権限の場合
-//		if(loginUserDto.getRole().equals("0001")) {
-//			Boolean hasBlankPastDate = studentAttendanceService.notEnterCheck();
-//			model.addAttribute("hasBlankPastDate", hasBlankPastDate);
-//		}
+	public String index(Model model) throws ParseException {
+
+		// 受講生権限か判定
+		if(loginUserDto.getRole().equals("0001")) {
+			Boolean hasBlankPastDate = studentAttendanceService.notEnterCheck();
+			model.addAttribute("hasBlankPastDate", hasBlankPastDate);
+	}
 
 		// 勤怠一覧の取得
 		List<AttendanceManagementDto> attendanceManagementDtoList = studentAttendanceService
