@@ -86,13 +86,14 @@
 			const minutes = ('0' + today.getMinutes()).slice(-2);
 			return hours + ':' + minutes;
 		}
-//現在改修中
-//		const hasBlankPastDate = /*[[${hasBlankPastDate}]]*/ fasle;
-//		$(document).ready(function(){
-//			if(hasBlankPastDate){
-//				alert("過去日の勤怠に未入力があります。");
-//			}
-//		});
+
+		//過去日の出勤時間、退勤時間に未入力があった場合
+		const hasBlankPastDate = /*[[${hasBlankPastDate}]]*/ fasle;
+		$(document).ready(function(){
+			if(hasBlankPastDate){
+				alert("過去日の勤怠に未入力があります。");
+			}
+		});
 	</script>
 
 </body>
