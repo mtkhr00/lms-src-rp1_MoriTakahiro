@@ -146,5 +146,33 @@ public class AttendanceUtil {
 		}
 		return false;
 	}
-
+	
+	/*-- 森 Task.26 --*/
+	/**
+	 * 時間のプルダウンマップ生成
+	 * 
+	 * @return 1時間刻みの時間(数値)マップ
+	 */
+	public LinkedHashMap<Integer, String> getHourMap() {
+		LinkedHashMap<Integer, String> hourMap = new LinkedHashMap<>();
+		for(int i=0; i < 24; i++) {
+			hourMap.put(i, String.format("%02d", i));
+		}
+		return hourMap;
+	}
+	
+	/**
+	 * 分のプルダウンマップ生成
+	 * 
+	 * @return 1分刻みの時間(数値)マップ
+	 */
+	public LinkedHashMap<Integer, String> getMinuteMap() {
+		LinkedHashMap<Integer, String> minuteMap = new LinkedHashMap<>();
+		for(int i=0; i < 60; i++) {
+			minuteMap.put(i, String.format("%02d",i));
+		}
+		return minuteMap;
+	}
+	/*-- 森 Task.26 --*/
+	
 }
