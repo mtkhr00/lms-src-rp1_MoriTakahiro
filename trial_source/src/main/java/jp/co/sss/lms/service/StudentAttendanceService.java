@@ -220,9 +220,9 @@ public class StudentAttendanceService {
 		attendanceForm.setUserName(loginUserDto.getUserName());
 		attendanceForm.setLeaveFlg(loginUserDto.getLeaveFlg());
 		attendanceForm.setBlankTimes(attendanceUtil.setBlankTime());
-		//修正中
 		/*-- 森 Task.26 --*/
-		attendanceForm.setTrainingStartTimeHour(attendanceUtil.getHourMap());
+		attendanceForm.setHourMap(attendanceUtil.getHourMap());
+		attendanceForm.setMinuteMap(attendanceUtil.getMinuteMap());
 		/*-- 森 Task.26 --*/
 
 		// 途中退校している場合のみ設定
@@ -243,6 +243,31 @@ public class StudentAttendanceService {
 			dailyAttendanceForm
 					.setTrainingStartTime(attendanceManagementDto.getTrainingStartTime());
 			dailyAttendanceForm.setTrainingEndTime(attendanceManagementDto.getTrainingEndTime());
+			
+			/*-- 森 Task.26 --*/
+			// 出勤時間取得
+			String startTimeString = attendanceManagementDto.getTrainingStartTime();
+			// nullと空文字どちらでもない場合
+			if(startTimeString != null && !startTimeString.isEmpty()) {
+				// 出勤時間(時)をセット
+				Integer startHour = attendanceUtil.getHour(startTimeString);
+				dailyAttendanceForm.setTrainingStartTimeHour(startHour);
+				// 出勤時間(分)をセット
+				Integer startMinute = attendanceUtil.getMinute(startTimeString);
+				dailyAttendanceForm.setTrainingStartTimeMinute(startMinute);
+			}
+			// 退勤時間取得
+						String endTimeString = attendanceManagementDto.getTrainingEndTime();
+			// nullと空文字どちらでもない場合
+			if(endTimeString != null && !startTimeString.isEmpty()) {
+				// 退勤時間(時)をセット
+				Integer endHour = attendanceUtil.getHour(endTimeString);
+				dailyAttendanceForm.setTrainingEndTimeHour(endHour);
+				// 退勤時間(分)をセット
+				Integer endMinute = attendanceUtil.getMinute(endTimeString);
+				dailyAttendanceForm.setTrainingEndTimeMinute(endMinute);
+			}
+			/*-- 森 Task.26 --*/
 			if (attendanceManagementDto.getBlankTime() != null) {
 				dailyAttendanceForm.setBlankTime(attendanceManagementDto.getBlankTime());
 				dailyAttendanceForm.setBlankTimeValue(String.valueOf(
@@ -270,6 +295,11 @@ public class StudentAttendanceService {
 	 * @throws ParseException
 	 */
 	public String update(AttendanceForm attendanceForm) throws ParseException {
+		
+		/*-- 森 Task.26 --*/
+		// 出勤／退勤時間をhh:mm形式に設定
+		formatConversion(attendanceForm);
+		/*-- 森 Task.26 --*/
 
 		Integer lmsUserId = loginUserUtil.isStudent() ? loginUserDto.getLmsUserId()
 				: attendanceForm.getLmsUserId();
@@ -365,4 +395,32 @@ public class StudentAttendanceService {
 		//未入力件数がない場合
 		return false;
 	}
+	
+	/*-- 森 Task.26 --*/
+	/**
+	 * 入力された出退勤の{時間}{分}をhh:mm形式に変換
+	 * 
+	 * @author 森
+	 * @return attendanceForm
+	 */
+	public void formatConversion(AttendanceForm attendanceForm) {
+		for(DailyAttendanceForm dailyAttendanceForm : attendanceForm.getAttendanceList()) {
+			Integer startTimeHour = dailyAttendanceForm.getTrainingStartTimeHour();
+			Integer startTimeMinute = dailyAttendanceForm.getTrainingStartTimeMinute();
+			// 出勤時間の「時」「分」が入力されている場合
+			if(startTimeHour != null && startTimeMinute != null) {
+				String startTimeString = String.format("%02d:%02d", startTimeHour, startTimeMinute);
+				dailyAttendanceForm.setTrainingStartTime(startTimeString);
+			}
+			
+			Integer endTimeHour = dailyAttendanceForm.getTrainingEndTimeHour();
+			Integer endTimeMinute = dailyAttendanceForm.getTrainingEndTimeMinute(); 
+			// 退勤時間の「時」「分」が入力されている場合
+			if(endTimeHour != null && endTimeMinute != null) {
+				String endTimeString = String.format("%02d:%02d", endTimeHour, endTimeMinute);
+				dailyAttendanceForm.setTrainingEndTime(endTimeString);
+			}
+		}
+	}
+	/*-- 森 Task.26 --*/
 }
