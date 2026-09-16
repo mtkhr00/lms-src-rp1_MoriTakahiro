@@ -155,6 +155,7 @@ public class AttendanceUtil {
 	 */
 	public LinkedHashMap<Integer, String> getHourMap() {
 		LinkedHashMap<Integer, String> hourMap = new LinkedHashMap<>();
+		hourMap.put(null, "");
 		for(int i=0; i < 24; i++) {
 			hourMap.put(i, String.format("%02d", i));
 		}
@@ -168,10 +169,31 @@ public class AttendanceUtil {
 	 */
 	public LinkedHashMap<Integer, String> getMinuteMap() {
 		LinkedHashMap<Integer, String> minuteMap = new LinkedHashMap<>();
+		minuteMap.put(null, "");
 		for(int i=0; i < 60; i++) {
 			minuteMap.put(i, String.format("%02d",i));
 		}
 		return minuteMap;
+	}
+	
+	/**
+	 * 時間(時)の切り出し
+	 * 
+	 * @param time 開始時刻or終了時刻
+	 * @return 出退勤時間(時間)
+	 */
+	public Integer getHour(String time) {
+		return Integer.parseInt(time.substring(0,2));
+	}
+	
+	/**
+	 * 時間(分)の切り出し
+	 * 
+	 * @param time 開始時刻or終了時刻
+	 * @return 出退勤時間(分)
+	 */
+	public Integer getMinute(String time) {
+		return Integer.parseInt(time.substring(3,5));
 	}
 	/*-- 森 Task.26 --*/
 	
