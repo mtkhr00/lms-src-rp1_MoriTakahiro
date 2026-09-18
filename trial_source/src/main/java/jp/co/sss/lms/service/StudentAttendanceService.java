@@ -379,7 +379,6 @@ public class StudentAttendanceService {
 	 * @throws ParseException
 	 */
 	public Boolean notEnterCheck() throws ParseException {
-		Integer lmsUserId = loginUserDto.getLmsUserId();
 
 		//現在日付の日付以降を0にするためのフォーマット設定
 		SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy/MM/dd");
@@ -387,6 +386,7 @@ public class StudentAttendanceService {
 		// formatで日付以降を0にした後、parseでDataインスタンスを生成
 		Date formattedDate = simpleDateFormat.parse(simpleDateFormat.format(today));
 
+		Integer lmsUserId = loginUserDto.getLmsUserId();
 		//過去日の出勤時間、退勤時間の未入力件数を取得
 		Integer pastBlankCount = tStudentAttendanceMapper.notEnterCount(lmsUserId, Constants.DB_FLG_FALSE,
 				formattedDate);
