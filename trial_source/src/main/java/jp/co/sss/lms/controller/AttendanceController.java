@@ -15,6 +15,7 @@ import jp.co.sss.lms.dto.LoginUserDto;
 import jp.co.sss.lms.form.AttendanceForm;
 import jp.co.sss.lms.service.StudentAttendanceService;
 import jp.co.sss.lms.util.Constants;
+import jp.co.sss.lms.util.LoginUserUtil;
 
 /**
  * 勤怠管理コントローラ
@@ -29,6 +30,10 @@ public class AttendanceController {
 	private StudentAttendanceService studentAttendanceService;
 	@Autowired
 	private LoginUserDto loginUserDto;
+	// 森貴裕 - Task.25
+	@Autowired
+	private LoginUserUtil loginUserUtil;
+	// 森貴裕 - Task.25
 
 	/**
 	 * 勤怠管理画面 初期表示
@@ -42,17 +47,20 @@ public class AttendanceController {
 	@RequestMapping(path = "/detail", method = RequestMethod.GET)
 	public String index(Model model) throws ParseException {
 
+		// 森貴裕 - Task.25
 		// 受講生権限か判定
-		if(loginUserDto.getRole().equals("0001")) {
+		if (loginUserUtil.isStudent()) {
+			// 過去日の未入力チェック処理の呼び出し
 			Boolean hasBlankPastDate = studentAttendanceService.notEnterCheck();
 			model.addAttribute("hasBlankPastDate", hasBlankPastDate);
-	}
+		}
+		// 森貴裕 - Task.25
 
 		// 勤怠一覧の取得
 		List<AttendanceManagementDto> attendanceManagementDtoList = studentAttendanceService
 				.getAttendanceManagement(loginUserDto.getCourseId(), loginUserDto.getLmsUserId());
 		model.addAttribute("attendanceManagementDtoList", attendanceManagementDtoList);
-		
+
 		return "attendance/detail";
 	}
 
