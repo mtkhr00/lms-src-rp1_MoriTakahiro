@@ -391,13 +391,8 @@ public class StudentAttendanceService {
 		Integer pastBlankCount = tStudentAttendanceMapper.notEnterCount(lmsUserId, Constants.DB_FLG_FALSE,
 				formattedDate);
 
-		//未入力件数がある場合
-		if (0 < pastBlankCount) {
-			return true;
-		}
-
-		//未入力件数がない場合
-		return false;
+		//未入力件数の有無結果
+		return 0 < pastBlankCount;
 	}
 	// 森貴裕 - Task.25
 
