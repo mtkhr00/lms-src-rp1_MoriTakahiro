@@ -86,7 +86,7 @@
 			const minutes = ('0' + today.getMinutes()).slice(-2);
 			return hours + ':' + minutes;
 		}
-
+		// 森 貴裕 - Task.25
 		//過去日の出勤時間、退勤時間に未入力があった場合
 		const hasBlankPastDate = /*[[${hasBlankPastDate}]]*/ fasle;
 		$(document).ready(function(){
@@ -94,6 +94,7 @@
 				alert("過去日の勤怠に未入力があります。");
 			}
 		});
+		// 森 貴裕 - Task.25
 	</script>
 
 </body>
