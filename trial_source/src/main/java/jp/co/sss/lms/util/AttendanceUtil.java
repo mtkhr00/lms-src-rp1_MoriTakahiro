@@ -147,7 +147,7 @@ public class AttendanceUtil {
 		return false;
 	}
 	
-	/*-- 森 Task.26 --*/
+	// 森貴裕 - Task.26
 	/**
 	 * 時間のプルダウンマップ生成
 	 * 
@@ -195,6 +195,6 @@ public class AttendanceUtil {
 	public Integer getMinute(String time) {
 		return Integer.parseInt(time.substring(3,5));
 	}
-	/*-- 森 Task.26 --*/
+	// 森貴裕 - Task.26
 	
 }
