@@ -20,7 +20,13 @@
 
 	<div class="row">
 		<div class="bs-component col-sm-12">
-
+			<!-- 森貴裕 - Task.27 -->
+			<th:block th:if="${#fields.hasAnyErrors()}">
+				<ul th:each="error : ${#lists.toList(#sets.toSet(#fields.allErrors()))}" style="padding-left: 0; list-style: none;">
+					<li><span th:text="'*' + '&nbsp' + ${error}" class="help-inline error"></span></li>
+				</ul>
+			</th:block>
+			<!-- 森貴裕 - Task.27 -->
 			<form th:action="@{/attendance/update}" method="post">
 				<table class="table table-hover dataTable no-footer">
 					<thead>
@@ -60,11 +66,12 @@
 								<!-- 森貴裕 - Task.26 -->
 								<td class="w70">
 									<!-- 森貴裕 - Task.26 -->
-									<!-- 削除
-									<input type="text" th:name="|attendanceList[${stat.index}].trainingStartTime|"
-									th:value="${dailyAttendanceForm.trainingStartTime}" class="form-control" />
-									-->
-									<select th:name="|attendanceList[${stat.index}].trainingStartTimeHour|" class="form-control">
+									<!-- 削除 <input type="text" th:name="|attendanceList[${stat.index}].trainingStartTime|" th:value="${dailyAttendanceForm.trainingStartTime}" class="form-control" /> -->
+									
+									<!-- 森貴裕 - Task.27 -->
+									<!-- 削除 <select th:name="|attendanceList[${stat.index}].trainingStartTimeHour|" class="form-control"> -->
+									<select th:name="|attendanceList[${stat.index}].trainingStartTimeHour|" class="form-control" th:errorclass="errorInput">
+									<!-- 森貴裕 - Task.27 -->
 										<option th:each="hour : ${attendanceForm.hourMap}" th:value="${hour.key}" th:inline="text" class="form-contorl"
 											th:selected="${hour.key == dailyAttendanceForm.trainingStartTimeHour}">[[${hour.value}]]</option>
 									</select>
@@ -73,7 +80,10 @@
 								<!-- 森貴裕 - Task.26 -->
 								<td>:</td>
 								<td>
-									<select th:name="|attendanceList[${stat.index}].trainingStartTimeMinute|" class="form-control">
+									<!-- 森貴裕 - Task.27 -->
+									<!-- 削除 <select th:name="|attendanceList[${stat.index}].trainingStartTimeMinute|" class="form-control"> -->
+									<select th:name="|attendanceList[${stat.index}].trainingStartTimeMinute|" class="form-control" th:errorclass="errorInput">
+									<!-- 森貴裕 - Task.27 -->
 										<option th:each="minute : ${attendanceForm.minuteMap}" th:value="${minute.key}" th:inline="text" class="form-contorl"
 											th:selected="${minute.key == dailyAttendanceForm.trainingStartTimeMinute}">[[${minute.value}]]</option>
 									</select>
@@ -81,11 +91,11 @@
 								<!-- 森貴裕 - Task.26 -->
 								<td>
 									<!-- 森貴裕 - Task.26 -->
-									<!-- 削除
-									<input type="text" th:name="|attendanceList[${stat.index}].trainingEndTime|"
-									th:value="${dailyAttendanceForm.trainingEndTime}" class="form-control" />
-									-->
-									<select th:name="|attendanceList[${stat.index}].trainingEndTimeHour|" class="form-control">
+									<!-- 削除 <input type="text" th:name="|attendanceList[${stat.index}].trainingEndTime|" th:value="${dailyAttendanceForm.trainingEndTime}" class="form-control" /> -->
+									<!-- 森貴裕 - Task.27 -->
+									<!-- 削除 <select th:name="|attendanceList[${stat.index}].trainingEndTimeHour|" class="form-control"> -->
+									<select th:name="|attendanceList[${stat.index}].trainingEndTimeHour|" class="form-control" th:errorclass="errorInput">
+									<!-- 森貴裕 - Task.27 -->
 										<option th:each="hour : ${attendanceForm.hourMap}" th:value="${hour.key}" th:inline="text" class="form-contorl"
 											th:selected="${hour.key == dailyAttendanceForm.trainingEndTimeHour}">[[${hour.value}]]</option>
 									</select>
@@ -94,7 +104,10 @@
 								<!-- 森貴裕 - Task.26 -->
 								<td>:</td>
 								<td>
-									<select th:name="|attendanceList[${stat.index}].trainingEndTimeMinute|" class="form-control">
+									<!-- 森貴裕 - Task.27 -->
+									<!-- 削除 <select th:name="|attendanceList[${stat.index}].trainingEndTimeMinute|" class="form-control"> -->
+									<select th:name="|attendanceList[${stat.index}].trainingEndTimeMinute|" class="form-control" th:errorclass="errorInput">
+									<!-- 森貴裕 - Task.27 -->
 										<option th:each="minute : ${attendanceForm.minuteMap}" th:value="${minute.key}" th:inline="text" class="form-contorl"
 											th:selected="${minute.key == dailyAttendanceForm.trainingEndTimeMinute}">[[${minute.value}]]</option>
 									</select>
@@ -102,7 +115,10 @@
 								<!-- 削除 <td class="w80"> -->
 								<td>	
 								<!-- 森貴裕 - Task.26 -->
-									<select th:name="|attendanceList[${stat.index}].blankTime|" class="form-control">
+									<!-- 森貴裕 - Task.27 -->
+									<!-- 削除 <select th:name="|attendanceList[${stat.index}].blankTime|" class="form-control"> -->
+									<select th:name="|attendanceList[${stat.index}].blankTime|" class="form-control" th:errorclass="errorInput">
+									<!-- 森貴裕 - Task.27 -->
 										<option th:each="blankTime : ${attendanceForm.blankTimes}" th:value="${blankTime.key}" th:inlne="text" class="form-control" 
 											th:selected="${blankTime.key == dailyAttendanceForm.blankTime}">[[${blankTime.value}]]</option>
 									</select>
@@ -123,12 +139,20 @@
 					<th:block th:if="${session.loginUserDto.role != '0001'}">
 						<input type="submit" value="戻る" name="indexCompany" class="btn btn-default" />
 					</th:block>
-					<input type="submit" value="更新" name="complete" class="btn btn-info" />
+					<input type="submit" value="更新" name="complete" class="btn btn-info"/>
 				</div>
 
 			</form>
 		</div>
 	</div>
-
+	<!-- 森貴裕 - Task.27 -->
+	<script th:type="text/javascript" th:inline="javascript">
+		$(document).ready(function(){
+			$(".form-group > input").on("click", function(){
+				alert("更新します。よろしいですか？");	
+			});
+		});
+	</script>
+	<!-- 森貴裕 - Task.27 -->
 </body>
 </html>
