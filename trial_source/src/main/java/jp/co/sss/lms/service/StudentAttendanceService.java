@@ -2,6 +2,8 @@ package jp.co.sss.lms.service;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -9,6 +11,8 @@ import java.util.List;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 
 import jp.co.sss.lms.dto.AttendanceManagementDto;
 import jp.co.sss.lms.dto.LoginUserDto;
@@ -244,7 +248,7 @@ public class StudentAttendanceService {
 					.setTrainingStartTime(attendanceManagementDto.getTrainingStartTime());
 			dailyAttendanceForm.setTrainingEndTime(attendanceManagementDto.getTrainingEndTime());
 
-			/*-- 森 Task.26 --*/
+			// 森貴裕 - Task.26
 			// 出勤時間取得
 			String startTimeString = attendanceManagementDto.getTrainingStartTime();
 			// nullと空文字どちらでもない場合
@@ -267,7 +271,7 @@ public class StudentAttendanceService {
 				Integer endMinute = attendanceUtil.getMinute(endTimeString);
 				dailyAttendanceForm.setTrainingEndTimeMinute(endMinute);
 			}
-			/*-- 森 Task.26 --*/
+			// 森貴裕 - Task.26
 
 			if (attendanceManagementDto.getBlankTime() != null) {
 				dailyAttendanceForm.setBlankTime(attendanceManagementDto.getBlankTime());
@@ -297,10 +301,14 @@ public class StudentAttendanceService {
 	 */
 	public String update(AttendanceForm attendanceForm) throws ParseException {
 
+		// 森貴裕 - Task.27
+		/** 削除
 		// 森貴裕 - Task.26
-		// 出勤／退勤時間をhh:mm形式に設定
+		// 出勤・退勤時間をhh:mm形式に設定
 		formatConversion(attendanceForm);
 		// 森貴裕 - Task.26
+		 */
+		// 森貴裕 - Task.27
 
 		Integer lmsUserId = loginUserUtil.isStudent() ? loginUserDto.getLmsUserId()
 				: attendanceForm.getLmsUserId();
@@ -423,4 +431,108 @@ public class StudentAttendanceService {
 		}
 	}
 	// 森貴裕 - Task.26
+
+	// 森貴裕 - Task.27
+	/**
+	 * 勤怠更新時の入力チェックを行う（文字数、時刻の整合性、中抜け時間の妥当性）
+	 * 
+	 * @author 森貴裕 - Task.27
+	 * @param attendanceForm
+	 * @param result
+	 */
+	public void updateInputCheck(AttendanceForm attendanceForm, BindingResult result) {
+		for (int i = 0; i < attendanceForm.getAttendanceList().size(); i++) {
+			DailyAttendanceForm dailyAttendanceForm = attendanceForm.getAttendanceList().get(i);
+
+			// 森貴裕 - Task.27
+			// 出勤／退勤時間をhh:mm形式に設定
+			formatConversion(attendanceForm);
+			// 森貴裕 - Task.27
+
+			// 備考の文字数が100より大きいか
+			if (dailyAttendanceForm.getNote().length() > 100) {
+				String fieldName = "attendanceList[" + i + "].note";
+				result.addError(new FieldError(result.getObjectName(), fieldName,
+						messageUtil.getMessage(Constants.VALID_KEY_MAXLENGTH, new String[] { "備考", "100" })));
+			}
+
+			// 出勤時間の（時）が入力されていて、（分）が未入力になっていないか
+			if (dailyAttendanceForm.getTrainingStartTimeHour() != null
+					&& dailyAttendanceForm.getTrainingStartTimeMinute() == null) {
+				String fieldName = "attendanceList[" + i + "].trainingStartTimeHour";
+				result.addError(new FieldError(result.getObjectName(), fieldName,
+						messageUtil.getMessage(Constants.INPUT_INVALID, new String[] { "出勤時間" })));
+			}
+
+			// 出勤時間の（分）が入力されていて、（時）が未入力になっていないか
+			if (dailyAttendanceForm.getTrainingStartTimeMinute() != null
+					&& dailyAttendanceForm.getTrainingStartTimeHour() == null) {
+				String fieldName = "attendanceList[" + i + "].trainingStartTimeMinute";
+				result.addError(new FieldError(result.getObjectName(), fieldName,
+						messageUtil.getMessage(Constants.INPUT_INVALID, new String[] { "出勤時間" })));
+			}
+
+			// 退勤時間の（時）が入力されていて、（分）が未入力になっていないか
+			if (dailyAttendanceForm.getTrainingEndTimeHour() != null
+					&& dailyAttendanceForm.getTrainingEndTimeMinute() == null) {
+				String fieldName = "attendanceList[" + i + "].trainingEndTimeHour";
+				result.addError(new FieldError(result.getObjectName(), fieldName,
+						messageUtil.getMessage(Constants.INPUT_INVALID, new String[] { "退勤時間" })));
+			}
+
+			// 退勤時間の（分）が入力されていて、（時）が未入力になっていないか
+			if (dailyAttendanceForm.getTrainingEndTimeMinute() != null
+					&& dailyAttendanceForm.getTrainingEndTimeHour() == null) {
+				String fieldName = "attendanceList[" + i + "].trainingEndTimeMinute";
+				result.addError(new FieldError(result.getObjectName(), fieldName,
+						messageUtil.getMessage(Constants.INPUT_INVALID, new String[] { "退勤時間" })));
+			}
+
+			// 退勤時間が入力されていて、出勤時間が未入力になっていないか
+			if (dailyAttendanceForm.getTrainingEndTime() != null
+					&& dailyAttendanceForm.getTrainingStartTime() == null) {
+				String firstFieldName = "attendanceList[" + i + "].trainingStartTimeHour";
+				String secondFieldName = "attendanceList[" + i + "].trainingStartTimeMinute";
+				result.addError(new FieldError(result.getObjectName(), firstFieldName,
+						messageUtil.getMessage(Constants.VALID_KEY_ATTENDANCE_PUNCHINEMPTY)));
+				result.addError(new FieldError(result.getObjectName(), secondFieldName,
+						messageUtil.getMessage(Constants.VALID_KEY_ATTENDANCE_PUNCHINEMPTY)));
+			}
+
+			// エラーが発生していないか
+			if (!result.hasErrors()) {
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
+				LocalTime trainingStartTime = LocalTime.parse(dailyAttendanceForm.getTrainingStartTime(), formatter);
+				LocalTime trainingEndTime = LocalTime.parse(dailyAttendanceForm.getTrainingEndTime(), formatter);
+				// 出勤時間が退勤時間よりも後の時間になっていないか
+				if (trainingStartTime.isBefore(trainingEndTime)) {
+					String firstFieldName = "attendanceList[" + i + "].trainingStartTimeHour";
+					String secondFieldName = "attendanceList[" + i + "].trainingStartTimeMinute";
+					result.addError(new FieldError(result.getObjectName(), firstFieldName,
+							messageUtil.getMessage(Constants.VALID_KEY_ATTENDANCE_TRAININGTIMERANGE,
+									new String[] { Integer.toString(i) })));
+					result.addError(new FieldError(result.getObjectName(), secondFieldName,
+							messageUtil.getMessage(Constants.VALID_KEY_ATTENDANCE_TRAININGTIMERANGE,
+									new String[] { Integer.toString(i) })));
+				}
+			}
+
+			// 中抜け時間が入力されているか
+			if (dailyAttendanceForm.getBlankTime() != null) {
+				// 中抜け時間(分)を時間と分に変換
+				TrainingTime blankTime = attendanceUtil.calcBlankTime(dailyAttendanceForm.getBlankTime());
+				TrainingTime trainingStartTime = new TrainingTime(dailyAttendanceForm.getTrainingStartTime());
+				TrainingTime trainingEndTime = new TrainingTime(dailyAttendanceForm.getTrainingEndTime());
+				TrainingTime trainingTime = trainingEndTime.subtract(trainingStartTime);
+				// 中抜け時間が勤務時間を超えないか
+				Integer resultOfCompare = blankTime.compareTo(trainingTime);
+				if (resultOfCompare < 0) {
+					String fieldName = "attendanceList[" + i + "].blankTime";
+					result.addError(new FieldError(result.getObjectName(), fieldName,
+							messageUtil.getMessage(Constants.VALID_KEY_ATTENDANCE_BLANKTIMEERROR)));
+				}
+			}
+		}
+	}
+	// 森貴裕 - Task.27
 }
