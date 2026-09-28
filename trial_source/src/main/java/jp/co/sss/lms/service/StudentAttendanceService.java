@@ -499,26 +499,36 @@ public class StudentAttendanceService {
 						messageUtil.getMessage(Constants.VALID_KEY_ATTENDANCE_PUNCHINEMPTY)));
 			}
 
-			// エラーが発生していないか
-			if (!result.hasErrors()) {
+			// エラーが発生していない且つ出勤時間と退勤時間がどちらも入力されているか
+			if (!result.hasErrors() && dailyAttendanceForm.getTrainingStartTime() != null) {
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
-				LocalTime trainingStartTime = LocalTime.parse(dailyAttendanceForm.getTrainingStartTime(), formatter);
+				LocalTime trainingStartTime = LocalTime.parse(dailyAttendanceForm.getTrainingStartTime(),
+						formatter);
 				LocalTime trainingEndTime = LocalTime.parse(dailyAttendanceForm.getTrainingEndTime(), formatter);
 				// 出勤時間が退勤時間よりも後の時間になっていないか
-				if (trainingStartTime.isBefore(trainingEndTime)) {
+				if (trainingStartTime.isAfter(trainingEndTime)) {
 					String firstFieldName = "attendanceList[" + i + "].trainingStartTimeHour";
 					String secondFieldName = "attendanceList[" + i + "].trainingStartTimeMinute";
+					String thirdFieldName = "attendanceList[" + i + "].trainingEndTimeHour";
+					String fourthFieldName = "attendanceList[" + i + "].trainingEndTimeMinute";
 					result.addError(new FieldError(result.getObjectName(), firstFieldName,
 							messageUtil.getMessage(Constants.VALID_KEY_ATTENDANCE_TRAININGTIMERANGE,
-									new String[] { Integer.toString(i) })));
+									new String[] { String.valueOf(i) })));
 					result.addError(new FieldError(result.getObjectName(), secondFieldName,
 							messageUtil.getMessage(Constants.VALID_KEY_ATTENDANCE_TRAININGTIMERANGE,
-									new String[] { Integer.toString(i) })));
+									new String[] { String.valueOf(i) })));
+					result.addError(new FieldError(result.getObjectName(), thirdFieldName,
+							messageUtil.getMessage(Constants.VALID_KEY_ATTENDANCE_TRAININGTIMERANGE,
+									new String[] { String.valueOf(i) })));
+					result.addError(new FieldError(result.getObjectName(), fourthFieldName,
+							messageUtil.getMessage(Constants.VALID_KEY_ATTENDANCE_TRAININGTIMERANGE,
+									new String[] { String.valueOf(i) })));
 				}
+
 			}
 
-			// 中抜け時間が入力されているか
-			if (dailyAttendanceForm.getBlankTime() != null) {
+			// エラーが発生していない且つ中抜け時間が入力されているか
+			if (!result.hasErrors() && dailyAttendanceForm.getBlankTime() != null) {
 				// 中抜け時間(分)を時間と分に変換
 				TrainingTime blankTime = attendanceUtil.calcBlankTime(dailyAttendanceForm.getBlankTime());
 				TrainingTime trainingStartTime = new TrainingTime(dailyAttendanceForm.getTrainingStartTime());
@@ -526,7 +536,7 @@ public class StudentAttendanceService {
 				TrainingTime trainingTime = trainingEndTime.subtract(trainingStartTime);
 				// 中抜け時間が勤務時間を超えないか
 				Integer resultOfCompare = blankTime.compareTo(trainingTime);
-				if (resultOfCompare < 0) {
+				if (resultOfCompare > 0) {
 					String fieldName = "attendanceList[" + i + "].blankTime";
 					result.addError(new FieldError(result.getObjectName(), fieldName,
 							messageUtil.getMessage(Constants.VALID_KEY_ATTENDANCE_BLANKTIMEERROR)));
