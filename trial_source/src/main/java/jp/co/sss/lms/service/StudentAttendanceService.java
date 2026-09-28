@@ -500,7 +500,8 @@ public class StudentAttendanceService {
 			}
 
 			// エラーが発生していない且つ出勤時間と退勤時間がどちらも入力されているか
-			if (!result.hasErrors() && dailyAttendanceForm.getTrainingStartTime() != null) {
+			if (!result.hasErrors() && dailyAttendanceForm.getTrainingStartTime() != null
+					&& dailyAttendanceForm.getTrainingEndTime() != null) {
 				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm");
 				LocalTime trainingStartTime = LocalTime.parse(dailyAttendanceForm.getTrainingStartTime(),
 						formatter);
